@@ -30,5 +30,10 @@ services:
       ENABLE_GII: 1
     ports: 
       - 8000:80
+    networks:
+      red:
+
+
+
 networks:
   red:

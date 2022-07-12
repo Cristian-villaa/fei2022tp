@@ -51,6 +51,38 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/carrera',
+                    'pluralize'=>false,
+                  ],
+                  [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/profesor',
+                    'pluralize'=>false,
+                  ],
+                  [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/materia',
+                    'pluralize'=>false,
+                  ],
+                  [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/aula',
+                    'pluralize'=>false,
+                  ],
+                  [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/reserva_aula',
+                    'pluralize'=>false,
+                  ],
+                  [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'apiv1/horario_materia',
+                    'pluralize'=>false,
+                  ],
+
+                
             ],
         ],
     ],

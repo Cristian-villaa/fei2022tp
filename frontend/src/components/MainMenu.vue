@@ -11,7 +11,7 @@
           contain
           :src="require('../assets/curza.png')"
           transition="scale-transition"
-          width="40"
+          width="50" 
         />
         <v-list-item-content>
           <v-list-item-title class="text-h6">
@@ -20,7 +20,7 @@
           <v-list-item-subtitle>
             Universidad del Comahue
           </v-list-item-subtitle>
-        </v-list-item-content>
+          </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
       <v-list dense>

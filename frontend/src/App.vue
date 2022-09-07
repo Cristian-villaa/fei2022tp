@@ -1,7 +1,7 @@
 <template>
-  <v-app>
+  <v-app ref="app">
+
     <main-menu></main-menu>
-    <main-bar></main-bar>
      <v-main>
       <v-container fluid>
         <router-view/>
@@ -12,14 +12,14 @@
 
 <script>
 import MainMenu from './components/MainMenu.vue';
-import MainBar from './components/MainBar.vue';
+
 
 export default {
   name: 'App',
 
   components: {
-    MainMenu,
-    MainBar
+    MainMenu
+   
   },
 
   data: () => ({
@@ -31,4 +31,13 @@ export default {
   }),
 };
 </script>
+<style>
+#app {
+  width: 100%;
+    height: 100%;
+  background:url('https://web.curza.uncoma.edu.ar/images/fondos/fondo5.jpg') no-repeat center center;
+  background-size: cover;
 
+}
+
+</style>

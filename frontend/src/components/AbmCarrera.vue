@@ -5,7 +5,7 @@
       <v-window-item :value="1">
      
  <h2 style="color: white; text-shadow: 2px 2px 4px black;">CREAR UNA NUEVA CARRERA:
-          <v-btn color="blue" dark    fab  class="mx-2"  @click="(step = 2)">
+          <v-btn color="primary" dark    fab  class="mx-2"  @click="(step = 2)">
             <v-icon dark>
               mdi-plus
             </v-icon>
@@ -59,7 +59,7 @@
       </v-window-item>
       <v-window-item :value="2">
         <div>
-          <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
+          <v-btn color="primary" elevation="10" dark title @click="(step = 1)">Atras</v-btn>
         </div>
         <v-col cols="12" sm="6">
           <v-card>
@@ -77,7 +77,7 @@
 
               </v-col>
             </v-row>
-            <v-btn color="green" dark block title elevation="5" @click="agregarCarrera(step = 1)">Crear</v-btn>
+            <v-btn color="primary" dark block title elevation="5" @click="agregarCarrera(step = 1)">Crear</v-btn>
 
           </v-card-text>
           </v-card>
@@ -85,22 +85,24 @@
       </v-window-item>
       <v-window-item :value="3">
         <div>
-          <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
+          <v-btn color="primary" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
         </div>
         <v-col cols="12" sm="6">
+          <v-card>
           <v-card-text class="mt-12">
             <h2 style="color: black ; text-shadow: 2px 2px 4px white;" class="tex-center">Editar Carrera</h2>
             <v-spacer></v-spacer>
             <v-row>
               <v-col cols="12" sm="12">
-                <v-text-field v-model="carrera.nombre" elevation="10" label="Nombre" outlined dense color="blue"
+                <v-text-field v-model="carrera.nombre" elevation="10" label="Nombre"  color="blue"
                   class="mt-4"></v-text-field>
               </v-col>
              </v-row>
-            <v-btn color="green" dark block title elevation="10" @click="editarCarrera(carrera.id, carrera, (step = 1))">
-              Editar</v-btn>
-
+            
+            <v-btn color="primary" type="success" dark block title elevation="10" @click="editarCarrera(carrera.id, carrera, (step = 1))">
+              Guardar Cambios</v-btn>
           </v-card-text>
+        </v-card> 
         </v-col>
       </v-window-item>
 
@@ -147,7 +149,7 @@ export default {
           console.log(response)
           that.listarCarreras()
           alert('Carrera Creada con exito')
-
+          
         })
 
     },
@@ -175,7 +177,7 @@ export default {
         .then(function (response) {
           console.log(response)
           that.listarCarreras()
-          alert('Carrera editada con exito')
+          alert('Carrera modificada con exito')
         })
     },
     mostrarCarrera(id) {

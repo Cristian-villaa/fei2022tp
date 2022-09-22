@@ -8,7 +8,7 @@
                   
                       <h2 style="color: white; text-shadow: 2px 2px 4px black;">NUEVA MATERIA:
                             
-                            <v-btn color="blue" dark    fab  class="mx-2"  @click="(step = 2)">
+                            <v-btn color="primary" dark    fab  class="mx-2"  @click="(step = 2)">
                                 <v-icon dark>
                                 mdi-plus
                                 </v-icon>
@@ -71,7 +71,7 @@
                 </v-window-item>
                 <v-window-item :value="2">
                     <div>
-                        <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
+                        <v-btn color="primary" elevation="10" dark title @click="(step = 1)">Atras</v-btn>
                     </div>
                     <v-col cols="12" sm="6">
                         <v-card>
@@ -102,7 +102,7 @@
                             </v-row>
                             <br>
                             <br>
-                            <v-btn color="green" dark block title elevation="10" @click="crearMateria(step = 1)">Crear
+                            <v-btn color="primary" dark block title elevation="10" @click="crearMateria(step = 1)">Crear
                             </v-btn>
 
                         </v-card-text>
@@ -144,8 +144,8 @@
                             
                             <br>
                             <br>
-                            <v-btn color="green" dark block title elevation="10"
-                                @click="editarMateria(materiamodificada.id, materiamodificada, step = 1)">Guardar
+                            <v-btn color="primary" dark block title elevation="10"
+                                @click="editarMateria(materiamodificada.id, materiamodificada, step = 1)">Guardar Cambios
                             </v-btn>
 
                         </v-card-text>
@@ -266,7 +266,7 @@ export default {
             this.axios.put("apiv1/materia/" + id, materia)
                 .then(function () {
                     that.listarMaterias()
-                    alert('Materia editada con exito')
+                    alert('Materia modificada con exito')
                 })
         },
         capturarIdProfesor() {

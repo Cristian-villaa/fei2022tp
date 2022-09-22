@@ -2,15 +2,15 @@
   <v-container >
  <h1 style="color: white; text-shadow: 2px 2px 4px black;">LISTA GENERAL DE PROFESORES</h1> <br>
     <v-window v-model=step >
-      <v-window-item :value="1" color="blue">
+      <v-window-item :value="1" color="primary">
        
-       <h1 style="color: white; text-shadow: 2px 2px 4px black;">INGRESAR UN NUEVO PROFESOR:
+       <h2 style="color: white; text-shadow: 2px 2px 4px black;">INGRESAR UN NUEVO PROFESOR:
          
-        <v-btn color="blue" dark    fab  class="mx-2"  @click="(step = 2)">
+        <v-btn color="primary" dark    fab  class="mx-2"  @click="(step = 2)">
             <v-icon dark>
               mdi-plus
             </v-icon>
-          </v-btn></h1><br>
+          </v-btn></h2><br>
 
         <v-simple-table>
 
@@ -67,7 +67,7 @@
       </v-window-item>
       <v-window-item :value="2">
         <div>
-          <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
+          <v-btn color="primary" elevation="10" dark title @click="(step = 1)">Atras</v-btn>
         </div>
         <v-col cols="12" sm="6">
             <v-card >
@@ -88,7 +88,7 @@
                   class="mt-4"></v-text-field>
               </v-col>
             </v-row>
-            <v-btn color="green" dark block title elevation="10" @click="agregarProfesor(step=1)">Crear</v-btn>
+            <v-btn color="primary" dark block title elevation="10" @click="agregarProfesor(step=1)">Crear</v-btn>
 
           </v-card-text>
           </v-card>
@@ -96,7 +96,7 @@
       </v-window-item>
       <v-window-item :value="3">
         <div>
-          <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
+          <v-btn color="primary" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
         </div>
         <v-col cols="12" sm="6">
           <v-card >
@@ -117,7 +117,7 @@
                   class="mt-4"></v-text-field>
               </v-col>
             </v-row>
-            <v-btn color="green" dark block title elevation="10" @click="editarProfesor(profesor.id,profesor,(step=1))">Guardar</v-btn>
+            <v-btn color="primary" dark block title elevation="10" @click="editarProfesor(profesor.id,profesor,(step=1))">Guardar Cambios</v-btn>
 
           </v-card-text>
         </v-card>
@@ -190,7 +190,7 @@ export default {
         .then(function (response) {
           console.log(response)
         that.listarProfesores()
-        alert('Profesor editado con exito')  
+        alert('Profesor modificado con exito')  
         })
     },
     mostrarProfesor(id) {

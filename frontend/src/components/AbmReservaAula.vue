@@ -1,337 +1,412 @@
 <template>
-    <v-container>
-
-        <v-window v-model=step>
-            <v-window-item :value="1">
-                <h1 style="color: white; text-shadow: 2px 2px 4px black;"> RESERVAS DE AULAS </h1> <br>
-                <div>
-                    <v-btn color="blue" dark title elevation="5" @click="(step = 2)">Crear Reserva</v-btn>
-                </div>
-                <v-icon right
-                      dark
-                     class="mt-4" 
-                     small
-                     color="green"
-                     @click="mostrarReserva(materia.id, step = 3)"> mdi-pencil</v-icon>
-          <v-icon
-                right
-                    small
-                     dark
-                     class="mt-4" 
-                    color="red"
-                    @click="eliminarReserva(materia.id)">mdi-delete</v-icon>
-               
- <template>
-  <v-row>
+      <v-container>
+        <h1 style="color: white; text-shadow: 2px 2px 4px black;">RESERVAS DE AULAS</h1> <br>
+  <v-row class="fill-height">
     <v-col>
-      <v-sheet height="400">
+      <v-sheet height="64">
+        <v-toolbar
+          flat
+        >
+
+        <v-btn color="primary" dark class="mr-4" @click="dialog = true">Crear Reserva</v-btn>
+          <v-btn
+            outlined
+            class="mr-4"
+            color="grey darken-2"
+            @click="setToday"
+          >
+            Today
+          </v-btn>
+          <v-btn
+            fab
+            text
+            small
+            color="grey darken-2"
+            @click="prev"
+          >
+            <v-icon small>
+              mdi-chevron-left
+            </v-icon>
+          </v-btn>
+          <v-btn
+            fab
+            text
+            small
+            color="grey darken-2"
+            @click="next"
+          >
+            <v-icon small>
+              mdi-chevron-right
+            </v-icon>
+          </v-btn>
+          <v-toolbar-title v-if="$refs.calendar">
+            {{ $refs.calendar.title }}
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+        
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                outlined
+                color="grey darken-2"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <span>{{ typeToLabel[type] }}</span>
+                <v-icon right>
+                  mdi-menu-down
+                </v-icon>
+              </v-btn>
+            </template>
+         
+        </v-toolbar>
+      </v-sheet>
+      <!-- Calendario -->
+      <v-sheet height="600">
         <v-calendar
           ref="calendar"
-          :now="today"
-          :value="today"
-          :events="events"
+          v-model="focus"
           color="primary"
-          type="week"
+          :events="events"
+          :event-color="getEventColor"
+          :categories="categories"
+          type="category"
+          locale="es"
+          @click:event="showEvent"
+          @click:more="viewDay"
+          @click:date="viewDay"
+          @change="updateRange"
         ></v-calendar>
+        
+        <!-- Modal Editar Evento-->
+        <v-menu
+          v-model="selectedOpen"
+          :close-on-content-click="false"
+          :activator="selectedElement"
+          offset-x
+        >
+          <v-card
+            color="grey lighten-4"
+            min-width="350px"
+            flat
+          >
+            <v-toolbar
+              :color="selectedEvent.color"
+              dark
+            >
+              <v-btn icon @click="deleteEvent(selectedEvent)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+              <v-toolbar-title v-html="selectedEvent.id_aula"></v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+
+
+            <v-card-text>
+             
+              <v-form v-if="currentlyEditing !== selectedEvent.id">
+                {{selectedEvent.name}} - {{selectedEvent.details}}
+              </v-form>
+
+              <v-form v-else>
+
+                <v-text-field 
+                  type="text" v-model="selectedEvent.id_materia"
+                  label="Editar Nombre">
+                </v-text-field>
+
+                <textarea-autosize
+                  v-model="selectedEvent.id_aula"
+                  type="text"
+                  style="width: 100%"
+                  :min-height="100"
+                ></textarea-autosize>
+
+              </v-form>
+
+            </v-card-text>
+
+            
+            <v-card-actions>
+              <v-btn
+                text
+                color="secondary"
+                @click="selectedOpen = false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn text v-if="currentlyEditing !== selectedEvent.id"
+              @click.prevent="editEvent(selectedEvent.id)">Editar</v-btn>
+
+              <v-btn text v-else  @click.prevent="updateEvent(selectedEvent)">Guardar Cambios</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
+             <!-- Modal Agregar Evento Formulario-->
+        <v-dialog v-model="dialog">
+          <v-card>
+            <v-container>
+              <v-form @submit.prevent="addEvent">
+                <v-select v-model=" nuevaReserva.id_aula" :items=aulas label="Aula a Reservar"
+                                  item-value="id" required color="blue" class="mt-4">
+                              </v-select>
+                <v-text-field 
+                  type="text" label="Agregar un Detalle" v-model=" nuevaReserva.observacion">
+                </v-text-field>
+                <v-text-field 
+                  type="date" label="Inicio del evento" v-model="start">
+                </v-text-field>
+                <v-text-field 
+                  type="date" label="Fin del evento" v-model="end">
+                </v-text-field>
+                <v-btn type="submit" color="primary" class="mr-4" 
+                @click.stop="dialog = false">Agregar</v-btn>
+              </v-form>
+            </v-container>
+          </v-card>
+        </v-dialog>
       </v-sheet>
     </v-col>
   </v-row>
+</v-container>
 </template>
-            </v-window-item>
-            <v-window-item :value="2">
-                <div>
-                    <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
-                </div>
-               
-                <v-col cols="12" sm="6">
-                    
-                   <v-card>
-                    <v-card-text  color="#26c6da" class="mt-12">
-                          
-                        <v-spacer></v-spacer>
-                         
-                    <h2 class="tex-center"> Nueva Reserva</h2>
-                   
-                        <v-row>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="nuevaReserva.id_aula" :items=aulas label="Aula a Reservar"
-                                    item-value="id" required  color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-                            <div>
-
-                                <v-menu ref="menu" v-model="menu" :close-on-content-click="false"
-                                    transition="scale-transition" offset-y min-width="auto">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="date" label="Fecha" prepend-icon="mdi-calendar" readonly
-                                            v-bind="attrs" v-on="on"></v-text-field>
-                                    </template>
-                                    <v-date-picker locale="es" v-model="date" :active-picker.sync="activePicker"
-                                        @change="save"></v-date-picker>
-                                </v-menu>
-                            </div>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="horad" :items=hora label="Hora Desde" required 
-                                    color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="horah" :items=hora label="Hora Hasta" required 
-                                    color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-
-
-
-                            <v-col cols="12" sm="12">
-                                <v-text-field v-model="nuevaReserva.observacion" elevation="10" label="Observacion"
-                                     color="blue" class="mt-4"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-spacer></v-spacer>
-                        <v-btn color="green" dark block title elevation="10" @click="crearReserva(step = 1)">Crear
-                        </v-btn>
-
-                    </v-card-text>
-                    </v-card>
-                </v-col>
-               
-            </v-window-item>
-            <v-window-item :value="3">
-                <div>
-                    <v-btn color="blue" elevation="10" dark title @click="(step = 1)">Volver</v-btn>
-                </div>
-                <v-col cols="12" sm="6">
-                    <v-card-text class="mt-12">
-                        <h2 class="tex-center">Editar Reserva</h2>
-                        <v-spacer></v-spacer>
-                        <v-row>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="aula_select" :items=aulas label="Aula Reservada" item-value="id"
-                                    required  color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-                            <div>
-
-                                <v-menu ref="menu" v-model="menu" :close-on-content-click="false"
-                                    transition="scale-transition" offset-y min-width="auto">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="date_select" label="Fecha" prepend-icon="mdi-calendar"
-                                            readonly v-bind="attrs" v-on="on"></v-text-field>
-                                    </template>
-                                    <v-date-picker locale="es" v-model="date" :active-picker.sync="activePicker"
-                                        @change="save"></v-date-picker>
-                                </v-menu>
-                            </div>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="horad_select" :items=hora label="Hora Desde" required 
-                                    color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-                            <v-col cols="12" sm="12">
-                                <v-select v-model="horah_select" :items=hora label="Hora Hasta" required 
-                                    color="blue" class="mt-4">
-                                </v-select>
-                            </v-col>
-
-
-
-                            <v-col cols="12" sm="12">
-                                <v-text-field v-model="reservaModificada.observacion" elevation="10" label="Observacion"
-                                     color="blue" class="mt-4"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-spacer></v-spacer>
-                        <v-btn color="green" dark block title elevation="10"
-                            @click="editarReserva(reservaModificada.id, reservaModificada, step = 1)">Editar Reserva
-                        </v-btn>
-
-                    </v-card-text>
-                </v-col>
-            </v-window-item>
-        </v-window>
-    </v-container>
-</template>
-
-
 <script>
-
-export default {
-    name: 'AulasReservaAula',
-    data() {
-        
-        return {
-            focus: '',
-             events: [
-       
-       
-     ],
-             
-            activePicker: null,
-            date: null,
-            menu: false,
-          
-            hora: [
-                '08:00:00',
-                '08:30:00',
-                '09:00:00',
-                '09:30:00',
-                '10:00:00',
-                '10:30:00',
-                '11:00:00',
-                '11:30:00',
-                '12:00:00',
-                '12:30:00',
-                '13:00:00',
-                '13:30:00',
-                '14:00:00',
-                '14:30:00',
-                '15:00:00',
-                '15:30:00',
-                '16:00:00',
-                '16:30:00',
-                '17:00:00',
-                '17:30:00',
-                '18:00:00',
-                '18:30:00',
-                '19:00:00',
-                '19:30:00',
-                '20:00:00',
-                
-            ],
-            Reservas: [],
-            aulas: [],
-            horad: '08:00:00',
-            horah: '09:00:00',
-            reservaModificada: {
-                id_aula: '',
-                fh_desde: '',
-                fh_hasta: '',
-                observacion: '',
-            },
-            nuevaReserva: {
-                id_aula: '',
-                fh_desde: '',
-                fh_hasta: '',
-                observacion: '',
-            },
-            reserva: {
-                id: '',
-                id_aula: '',
-                fh_desde: '',
-                fh_hasta: '',
-                observacion: '',
-            },
-            aula: [],
-            aula_select: '',
-            horad_select: '',
-            horah_select: '',
-            date_select: '',
-            step: 1,
-        }
+  export default {
+    data: () => ({
+      activePicker: null,
+      date: null,
+      dialog: false,
+      focus: '',
+      horaDesde: '',
+          horaHasta: '',
+          Reservas: [],
+          aulas: [],
+      type: 'month',
+      typeToLabel: {
+        month: 'Month',
+        week: 'Week',
+        day: 'Day',
+        '4day': '4 Days',
+      },
+      reservaModificada: {
+              id_aula: '',
+              fh_desde: '',
+              fh_hasta: '',
+              observacion: '',
+          },
+          nuevaReserva: {
+              id_aula: '',
+              fh_desde: '',
+              fh_hasta: '',
+              observacion: '',
+          },aula: [],
+          aula_select: '',
+          horad_select: '',
+          horah_select: '',
+          date_select: '',
+      selectedEvent: {},
+      selectedElement: null,
+      selectedOpen: false,
+      events: [],
+      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
+      names: ['Base de Datos', 'Diseño Grafico', 'Analisis de Sistemas', 'IPOO', 'Web Avanzada', 'Frameword', 'Web Dinamica'],
+      categories: ['Aula 1', 'Aula 2', 'Aula 3'],
+    }),
+    mounted () {
+      var that = this
+      that.listarReservas()
+      that.cargarAulas()
+      this.$refs.calendar.checkChange()
     },
-    mounted: function () {
-        var that = this
-        that.listarReservas()
-        that.cargarAulas()
-       
-    },
-
     methods: {
-        save(date) {
-            var that = this
-            that.$refs.menu.save(date)
-            console.log(that.date)
-            that.nuevaReserva.fh_desde = that.date
-            that.nuevaReserva.fh_hasta = that.date
-        },
-        listarReservas() {
-            var that = this
-           this.axios.get("apiv1/reserva")
-                .then(function (response) {
-                    that.Reservas = response.data;
-                })
-        },
-        crearReserva() {
-            var that = this
-            that.nuevaReserva.fh_desde += " " + that.horad
-            that.nuevaReserva.fh_hasta += " " + that.horah
-            console.log(that.nuevaReserva.fh_desde)
-            this.axios.post("apiv1/reserva", this.nuevaReserva)
-                .then(function (response) {
-                    console.log(response)
-                    that.listarReservas()
-                    alert('Reserva creada con exito')
-                })
-        },
-        eliminarReserva(id) {
-            var that = this
-            this.axios.delete("apiv1/reserva" + id)
-                .then(function (response) {
-                    console.log(response);
-                    that.listarReservas()
-                    alert('Reserva eliminada con exito')
-                })
-        },
-        cargarAulas() {
-            var that = this
-            this.axios.get("apiv1/aula")
-                .then(function (response) {
-                    for (let i = 0; i < response.data.length; i++) {
-                        let aulas = []
-                        aulas.id = response.data[i].id;
-                        aulas.text = response.data[i].descripcion;
-                        that.aulas.push(aulas)
-                    }
-                })
-        },
-        editarReserva(id, reserva) {
-            var that = this
-            this.axios.put("apiv1/reserva" + id, reserva)
-                .then(function () {
-                    that.listarReservas()
-                    alert('Reserva editada con exito')
-                })
-        },
-        mostrarReserva(id) {
-            var that = this
-            this.axios.get("apiv1/reserva" + id)
-                .then(function (response) {
-                    const {
-                        id,
-                        fh_desde,
-                        fh_hasta,
-                        aula,
-                        observacion,
-                    } = response.data;
-                    that.reservaModificada.id = id;
-                    that.reservaModificada.id_aula = aula.id;
-                    that.reservaModificada.fh_desde = fh_desde;
-                    that.reservaModificada.fh_desde = fh_hasta;
-                    that.reservaModificada.observacion = observacion
-                    that.aula_select = { text: response.data.aula.descripcion, id: response.data.aula.id }
-                    console.log(that.reservaModificada)
-                })
-        },
-       
-    },
-        capturarIdAula() {
-            this.reservaModificada.id_aula = this.aula_select
-        },
-        separarHorad() {
-            var that = this
-            const date = that.reservaModificada.fh_desde.split(" ")
-            that.date_select= date[0];
-            that.horad_select=date[1];
-            console.log(date)
-        },
-        separarHorah() {
-            var that = this
-            const date = that.reserva.fh_hasta.split(" ")
-            that.date_select = date[0];
-            that.horah_select = date[1];
-             console.log(date)
-        },
-}
 
+      async updateEvent(ev){
+          try {
+  
+            await this.axios.collection('eventos').doc(ev.id).update({
+              id_aula: ev.id_aula,
+            
+            })
+  
+            this.selectedOpen = false;
+            this.currentlyEditing = null;
+  
+            
+          } catch (error) {
+            console.log(error);
+          }
+        },
+        editEvent(id){
+          this.currentlyEditing = id
+        },
+        async deleteEvent(ev){
+          try {
+  
+            await this.axios.collection('eventos').doc(ev.id).delete();
+            this.selectedOpen = false;
+            this.getEvents();
+            
+          } catch (error) {
+            console.log(error);
+          }
+        },
+
+
+
+
+      save(date) {
+          var that = this
+          that.$refs.menu.save(date)
+          console.log(that.date)
+          that.nuevaReserva.fh_desde = that.date
+          that.nuevaReserva.fh_hasta = that.date
+      },
+      listarReservas() {
+          var that = this
+          this.axios.get("apiv1/reserva")
+              .then(function (response) {
+                  that.Reservas = response.data;
+              })
+      },
+      crearReserva() {
+          var that = this
+          that.nuevaReserva.fh_desde += " " + that.horaDesde
+          that.nuevaReserva.fh_hasta += " " + that.horaHasta
+          console.log(that.nuevaReserva.start)
+
+        this.axios.post("apiv1/reserva", this.nuevaReserva)
+              .then(function (response) {
+                  console.log(response)
+                  that.listarReservas()
+                  alert('Reserva creada con exito')
+              })
+      },
+      eliminarReserva(id) {
+          var that = this
+          this.axios.delete("apiv1/reserva" + id)
+              .then(function (response) {
+                  console.log(response);
+                  that.listarReservas()
+                  alert('Reserva eliminada con exito')
+              })
+      },
+      cargarAulas() {
+          var that = this
+          this.axios.get("apiv1/aula")
+              .then(function (response) {
+                  for (let i = 0; i < response.data.length; i++) {
+                      let aulas = []
+                      aulas.id = response.data[i].id;
+                      aulas.text = response.data[i].descripcion;
+                      that.aulas.push(aulas)
+                  }
+              })
+      },editarReserva(id, reserva) {
+          var that = this
+          this.axios.put("apiv1/reserva" + id, reserva)
+              .then(function () {
+                  that.listarReservas()
+                  alert('Reserva modificada con exito')
+              })
+      },
+      mostrarReserva(id) {
+          var that = this
+          this.axios.get("apiv1/reserva" + id)
+              .then(function (response) {
+              const {
+                      id,
+                      start,
+                      end,
+                      aula,
+                      observacion,
+                  } = response.data;
+                  that.reservaModificada.id = id;
+                  that.reservaModificada.id_aula = aula.id;
+                  that.reservaModificada.start =start;
+                  that.reservaModificada.end= end;
+                  that.reservaModificada.observacion = observacion
+                  that.aula_select = { text: response.data.aula.descripcion, id: response.data.aula.id }
+                  console.log(that.reservaModificada)
+              })
+      },
+      capturarIdAula() {
+          this.reservaModificada.id_aula = this.aula_select
+      },
+      separarHorad() {
+          var that = this
+          const date = that.reservaModificada.start.split(" ")
+          that.date_select= date[0];
+          that.horad_select=date[1];
+          console.log(date)
+      },
+      separarHorah() {
+          var that = this
+          const date = that.reserva.end.split(" ")
+          that.date_select = date[0];
+          that.horah_select = date[1];
+           console.log(date)
+      },
+      viewDay ({ date }) {
+        this.focus = date
+        this.type = 'day'
+      },
+      getEventColor (event) {
+        return event.color
+      },
+      setToday () {
+        this.focus = ''
+      },
+      prev () {
+        this.$refs.calendar.prev()
+      },
+      next () {
+        this.$refs.calendar.next()
+      },
+      showEvent ({ nativeEvent, event }) {
+        const open = () => {
+          this.selectedEvent = event
+          this.selectedElement = nativeEvent.target
+          requestAnimationFrame(() => requestAnimationFrame(() => this.selectedOpen = true))
+        }
+
+        if (this.selectedOpen) {
+          this.selectedOpen = false
+          requestAnimationFrame(() => requestAnimationFrame(() => open()))
+        } else {
+          open()
+        }
+
+        nativeEvent.stopPropagation()
+      },
+      updateRange ({ start, end }) {
+        const events = []
+
+        const min = new Date(`${start.date}T00:00:00`)
+        const max = new Date(`${end.date}T23:59:59`)
+        const days = (max.getTime() - min.getTime()) / 86400000
+        const eventCount = this.rnd(days, days + 20)
+
+        for (let i = 0; i < eventCount; i++) {
+          const allDay = this.rnd(0, 3) === 0
+          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
+          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
+          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
+          const second = new Date(first.getTime() + secondTimestamp)
+
+          events.push({
+            name: this.names[this.rnd(0, this.names.length - 1)],
+            start: first,
+            end: second,
+            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            timed: !allDay,
+            category: this.categories[this.rnd(0, this.categories.length - 1)],
+          })
+        }
+
+        this.events = events
+      },
+      rnd (a, b) {
+        return Math.floor((b - a + 1) * Math.random()) + a
+      },
+    },
+  }
 </script>
